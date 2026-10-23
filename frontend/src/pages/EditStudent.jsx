@@ -1,0 +1,230 @@
+import { useEffect, useState } from "react";
+import {
+  Container,
+  Card,
+  Form,
+  Button,
+  Alert,
+} from "react-bootstrap";
+import {
+  useNavigate,
+  useParams,
+} from "react-router-dom";
+
+const API_URL = "http://127.0.0.1:8000/api";
+
+const EditStudent = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    course: "",
+    address: "",
+  });
+
+  const [profileImage, setProfileImage] = useState(null);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    getStudent();
+  }, [id]);
+
+  const getStudent = async () => {
+    try {
+      const token = localStorage.getItem("access_token");
+
+      const res = await fetch(
+        `${API_URL}/students/${id}/`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setFormData({
+          name: data.name || "",
+          email: data.email || "",
+          phone: data.phone || "",
+          course: data.course || "",
+          address: data.address || "",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      setError("Failed to load student");
+    }
+  };
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const token = localStorage.getItem("access_token");
+
+      const data = new FormData();
+
+      data.append("name", formData.name);
+      data.append("email", formData.email);
+      data.append("phone", formData.phone);
+      data.append("course", formData.course);
+      data.append("address", formData.address);
+
+      if (profileImage) {
+        data.append("profile_image", profileImage);
+      }
+
+      const res = await fetch(
+        `${API_URL}/students/${id}/`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: data,
+        }
+      );
+
+      if (res.ok) {
+        navigate("/students");
+      } else {
+        setError("Failed to update student");
+      }
+    } catch (error) {
+      console.log(error);
+      setError("Server error");
+    }
+  };
+
+  return (
+    <Container className="mt-5">
+
+      <Card className="shadow">
+
+        <Card.Body>
+
+          <h2 className="mb-4">
+            Edit Student
+          </h2>
+
+          {error && (
+            <Alert variant="danger">
+              {error}
+            </Alert>
+          )}
+
+          <Form onSubmit={handleSubmit}>
+
+            <Form.Group className="mb-3">
+              <Form.Label>Name</Form.Label>
+
+              <Form.Control
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                required
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Label>Email</Form.Label>
+
+              <Form.Control
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Label>Phone</Form.Label>
+
+              <Form.Control
+                type="text"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                required
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Label>Course</Form.Label>
+
+              <Form.Control
+                type="text"
+                name="course"
+                value={formData.course}
+                onChange={handleChange}
+                required
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Label>Address</Form.Label>
+
+              <Form.Control
+                as="textarea"
+                rows={3}
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-4">
+              <Form.Label>
+                Change Profile Image
+              </Form.Label>
+
+              <Form.Control
+                type="file"
+                accept="image/*"
+                onChange={(e) =>
+                  setProfileImage(e.target.files[0])
+                }
+              />
+            </Form.Group>
+
+            <Button
+              type="submit"
+              variant="primary"
+              className="me-2"
+            >
+              Update Student
+            </Button>
+
+            <Button
+              variant="secondary"
+              onClick={() => navigate("/students")}
+            >
+              Cancel
+            </Button>
+
+          </Form>
+
+        </Card.Body>
+
+      </Card>
+
+    </Container>
+  );
+};
+
+export default EditStudent;

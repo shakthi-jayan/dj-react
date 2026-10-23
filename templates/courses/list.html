@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Courses</h1>
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>Name</th>
+            <th>Duration</th>
+            <th>Description</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        <a href="{% url 'create_course' %}" class="btn btn-success m-2">Add Course</a>
+        <a href="{% url 'student_list' %}" class="btn btn-success">View Students List</a>
+        {% for course in courses %}
+        <tr>
+            <td>{{ course.name }}</td>
+            <td>{{ course.duration }}</td>
+            <td>{{ course.description }}</td>
+            <td>
+                <a href="{% url 'edit_course' course.id %}">Edit</a> | 
+                <a href="{% url 'delete_course' course.id %}">Delete</a>
+            </td>
+        {% endfor %} 
+    </tbody>
+</table>
+{% endblock %}

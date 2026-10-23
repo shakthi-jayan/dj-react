@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Students</h1>
+
+<form method="GET" class="mb-3 d-flex">
+    <input type="text" name="search" class="form-control me-2" placeholder="Search Student">
+    <button type="submit" class="btn btn-primary">Search</button>
+</form>
+
+<a href="{% url 'create_student' %}" class="btn btn-success mb-3">Add Student</a>
+<a href="{% url 'course_list' %}" class="btn btn-success mb-3">View Course List</a>
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Course</th>
+            <th>Profile Image</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for student in students %}
+        <tr>
+            <td>{{ student.name }}</td>
+            <td>{{ student.email }}</td>
+            <td>{{ student.phone }}</td>
+            <td>{{ student.course }}</td>
+            <td>
+                {% if student.profile_image %}
+                    <img src="{{ student.profile_image.url }}" width="100" height="100" class="img-thumbnail">
+                {% endif %}
+            </td>
+            <td>
+                <a href="{% url 'edit_student' student.id %}" class="btn btn-sm btn-warning">Edit</a>
+                <a href="{% url 'delete_student' student.id %}" class="btn btn-sm btn-danger">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div class="d-flex justify-content-between align-items-center mt-3">
+    <div>
+        {% if students.has_previous %}
+            <a href="?page=1" class="btn btn-outline-secondary btn-sm">First</a>
+            <a href="?page={{ students.previous_page_number }}" class="btn btn-outline-secondary btn-sm">Previous</a>
+        {% endif %}
+    </div>
+
+    <span>Page {{ students.number }} of {{ students.paginator.num_pages }}</span>
+
+    <div>
+        {% if students.has_next %}
+            <a href="?page={{ students.next_page_number }}" class="btn btn-outline-secondary btn-sm">Next</a>
+            <a href="?page={{ students.paginator.num_pages }}" class="btn btn-outline-secondary btn-sm">Last</a>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

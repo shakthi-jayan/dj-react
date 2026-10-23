@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Student{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Edit Course</h1>
+<form method="POST" enctype="multipart/form-data" class="p-3 border rounded bg-light">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button class="btn btn-warning" type="submit">Update</button>
+</form>
+{% endblock %}
+
